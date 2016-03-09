@@ -1,0 +1,32 @@
+{
+    "name":"cfmlparser",
+    "version":"1.0.0",
+    "author":"Pete Freitag / Foundeo Inc.",
+    "slug":"cfmlparser",
+    "shortDescription":"A CFML Parser written in CFML.",
+    "private":false,
+    "engines":[
+        {
+            "type":"lucee",
+            "version":">=4.5.x"
+        },
+        {
+            "type":"adobe",
+            "version":">=10.0.0"
+        }
+    ],
+    "devDependencies":{
+        "testbox":"2.2.0"
+    },
+    "installPaths":{
+        "testbox":"tests/testbox"
+    },
+    "defaultPort":8337,
+    "ignore":[
+        "**/.*",
+        "tests"
+    ],
+    "testbox" : {
+        "runner" : "http://127.0.0.1:8337/tests/run.cfm"
+    }
+}
