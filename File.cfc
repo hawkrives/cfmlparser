@@ -31,6 +31,10 @@ component {
 		return variables.parser;
 	}
 
+	function getStatements() {
+		return getParser().getStatements();
+	}
+
 	boolean function isScript() {
 		return variables.isScript;
 	}
