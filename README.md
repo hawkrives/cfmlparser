@@ -2,6 +2,8 @@
 
 A CFML Parser written in CFML
 
+[![Build Status](https://travis-ci.org/foundeo/cfmlparser.svg?branch=master)](https://travis-ci.org/foundeo/cfmlparser)
+
 ## Basic Usage
 
 	file = new cfmlparser.File("/path/to/file.cfm");
