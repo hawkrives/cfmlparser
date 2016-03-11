@@ -51,6 +51,42 @@ component extends="BaseTest" {
 
 	}
 
+	function testGtInTag() {
+		var parser = getParser("tag/gt-in-tag.cfm");
+		var statements = parser.getStatements();
+		var tag = statements[1];
+
+		$assert.isEqual(" hasGt =  find("">"", str)", tag.getAttributeContent());
+
+	}
+
+	function testGtInTagAttribute() {
+		var parser = getParser("tag/gt-in-tag.cfm");
+		var statements = parser.getStatements();
+		var tag = statements[2];
+
+		$assert.isEqual(" var=""##find('>',str)##""", tag.getAttributeContent());
+
+	}
+
+	function testGtInTagAttributeWithSameQuotes() {
+		var parser = getParser("tag/gt-in-tag.cfm");
+		var statements = parser.getStatements();
+		var tag = statements[3];
+
+		$assert.isEqual(" var=""##find("">"",str)##""", tag.getAttributeContent());
+
+	}
+
+	function testGetTagEndPosition() {
+		var tp = new cfmlparser.TagParser();
+		var tag = "<" & "cfabort" & "> foo";
+		$assert.isEqual(9, tp.getTagEndPosition(tag, len(tag), 1));
+
+		tag = "<" & "cfabort" & "> foo";
+
+	}
+
 	private function getParser(string template) {
 		return getFile(arguments.template).getParser();
 	}

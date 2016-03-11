@@ -3,6 +3,7 @@ component {
 	variables.filePath = "";
 	variables.parser = "";
 	variables.isScript = false;
+	variables.fileLength = 0;
 
 	function init(string filePath="", string fileContent="") {
 		if (len(arguments.fileContent) == 0 && len(arguments.filePath) > 0) {
@@ -11,7 +12,7 @@ component {
 			variables.fileContent = arguments.fileContent;
 		}
 		variables.filePath = arguments.filePath;
-
+		variables.fileLength = len(variables.fileContent);
 		if (reFind("component[^>]*{", arguments.fileContent)) {
 			//script cfc
 			variables.isScript = true;
@@ -25,6 +26,10 @@ component {
 
 	function getFileContent() {
 		return variables.fileContent;
+	}
+
+	function getFileLength() {
+		return variables.fileLength;
 	}
 
 	function getParser() {

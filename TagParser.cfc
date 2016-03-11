@@ -11,7 +11,7 @@ component extends="AbstractParser" {
 		var tag = "";
 		var c = "";
 		var content = arguments.file.getFileContent();
-		var contentLength = len(content);
+		var contentLength = arguments.file.getFileLength();
 		var ltPos = Find("<", content);
 		var endTagPos = 0;
 		var nextTagPos = 0;
@@ -24,7 +24,7 @@ component extends="AbstractParser" {
 				//have whitespace before tag name < tag>
 				spacePos = ReFind("[[:space:]]", content, charPos+1);
 			}
-			gtPos = Find(">", content, ltPos);
+			gtPos = getTagEndPosition(content, contentLength, ltPos+1);
 			if (gtPos == 0) {
 				//invalid tag
 				break;
@@ -98,6 +98,42 @@ component extends="AbstractParser" {
 			}
 			ltPos = find("<", content, gtPos);
 		}
+	}
+
+	public numeric function getTagEndPosition(content, contentLength, startPosition) {
+		var pos = arguments.startPosition;
+		var c = "";
+		var inDouble = false;
+		var inSingle = false;
+		var inPound = false;
+		if (arguments.startPosition >= contentLength) {
+			return arguments.contentLength;
+		}
+		while (pos < arguments.contentLength) {
+			c = mid(arguments.content, pos, 1);
+			if (!inSingle && c == """") {
+				if (inDouble && mid(arguments.content, pos+1,1) == """") {
+					pos = pos+2;
+					continue;
+				}
+				inDouble = !inDouble;
+			} else if (!inDouble && c == "'") {
+				if (inSingle && mid(arguments.content, pos+1,1) == "'") {
+					pos = pos+2;
+					continue;
+				}
+				inSingle = !inSingle;
+			} else if (c == "##") {
+				//if next char is also a pound then it is escaped so ignore it
+				if (mid(arguments.content, pos+1,1) != "##") {
+					inPound = !inPound;
+				}
+			} else if (c == ">" && !inSingle && !inDouble && !inPound) {
+				return pos;
+			}
+			pos++;
+		}
+		return pos;
 	}
 
 

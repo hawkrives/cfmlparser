@@ -44,6 +44,10 @@ component {
 		return false;
 	}
 
+	public boolean function hasParent() {
+		return variables.hasParent;
+	}
+
 	public function getParent() {
 		return variables.parent;
 	}
@@ -66,6 +70,10 @@ component {
 		} else {
 			return mid(getFile().getFileContent(), variables.startPosition, variables.endPosition-variables.startPosition+1);
 		}
+	}
+
+	public array function getChildren() {
+		return variables.children;
 	}
 
 	function getVariables() {
