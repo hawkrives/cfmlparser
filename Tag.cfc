@@ -2,6 +2,7 @@ component extends="Statement" {
 	
 	variables.endTagStartPosition = 0;
 	variables.startTagEndPosition = 0;
+	variables.attributeExpressions = [];
 
 	
 	public boolean function isTag() {

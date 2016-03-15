@@ -16,7 +16,7 @@
         }
     ],
     "devDependencies":{
-        "testbox":"2.2.0"
+        "testbox":"2.3"
     },
     "installPaths":{
         "testbox":"tests/testbox"
@@ -26,7 +26,7 @@
         "**/.*",
         "tests"
     ],
-    "testbox" : {
-        "runner" : "http://127.0.0.1:8337/tests/run.cfm"
+    "testbox":{
+        "runner":"http://127.0.0.1:8337/tests/run.cfm"
     }
 }

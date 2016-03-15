@@ -100,7 +100,22 @@ component extends="BaseTest" {
 
 	}
 
+	function testGetAttributeQuoteless() {
+		var parser = getParser("tag/quoteless-attributes.cfm");
+		var statements = parser.getStatements();
+		var tag = statements[1];
+		var attr = tag.getAttributes();
+		//tag 1 cflocation
+		
+		$assert.isTrue(tag.isTag(), "isTag");
+		$assert.isEqual("cflocation", tag.getName(), "Name should be cflocation");
+		$assert.isNotEmpty(attr);
+		$assert.key(attr, "url");
+		$assert.isEqual(attr.url, "go.cfm");
+		$assert.key(attr, "addtoken");
+		$assert.isEqual(attr.addtoken, "false");
 
+	}
 
 
 
