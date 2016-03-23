@@ -28,6 +28,10 @@ component {
 		return variables.fileContent;
 	}
 
+	function getFilePath() {
+		return variables.filePath;
+	}
+
 	function getFileLength() {
 		return variables.fileLength;
 	}
@@ -42,6 +46,60 @@ component {
 
 	boolean function isScript() {
 		return variables.isScript;
+	}
+
+	numeric function getLineNumber(numeric position) {
+		var i = 0;
+		var line = 1;
+		var c = "";
+		for ( i=1 ; i<=arguments.position ; i++ ) {
+			c = Mid(variables.fileContent, i, 1);
+			if ( c == Chr(10) ) {
+				line = line + 1;
+			}
+		}
+		return line;
+	}
+
+	numeric function getPositionInLine(numeric position) {
+		var i = 0;
+		var line = 1;
+		var c = "";
+		var p = 0;
+		for ( i=1 ; i<=arguments.position ; i++ ) {
+			p = p+1;
+			c = Mid(variables.fileContent, i, 1);
+			if ( c == Chr(10) ) {
+				line = line + 1;
+				if ( i != arguments.position ) {
+					p = 0;
+				}
+			} else if ( c == Chr(13) && i != arguments.position ) {
+				p = 0;
+			}
+		}
+		return p;
+	}
+
+	public string function getLineContent(numeric lineNumber) {
+		var i = "";
+		var c = "";
+		var lineNum = 1;
+		var lineStart = 1;
+		var lineEnd = variables.fileLength;
+		for ( i=1 ; i<=variables.fileLength ; i++ ) {
+			c = Mid(variables.fileContent, i, 1);
+			if ( c == Chr(10) ) {
+				lineNum = lineNum + 1;
+				if ( lineNum == arguments.lineNumber + 1 ) {
+					lineEnd = i;
+					break;
+				} else if ( lineNum == arguments.lineNumber ) {
+					lineStart = i;
+				}
+			}
+		}
+		return Mid(variables.fileContent, lineStart, lineEnd-lineStart+1);
 	}
 
 }

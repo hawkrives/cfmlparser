@@ -127,7 +127,11 @@ component extends="AbstractParser" {
 				//if next char is also a pound then it is escaped so ignore it
 				if (mid(arguments.content, pos+1,1) != "##") {
 					inPound = !inPound;
+				} else {
+					pos = pos+2;
+					continue;
 				}
+
 			} else if (c == ">" && !inSingle && !inDouble && !inPound) {
 				return pos;
 			}

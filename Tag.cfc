@@ -17,6 +17,10 @@ component extends="Statement" {
 		variables.startTagEndPosition = arguments.position;
 	}
 
+	public function getInnerContentStartPosition() {
+		return getStartTagEndPosition()+1;
+	}
+
 	public function getStartTagEndPosition() {
 		return variables.startTagEndPosition;
 	}
@@ -229,9 +233,198 @@ component extends="Statement" {
 		return variables.attributeStruct;
 	}
 
-	public function getExpressionsFromString(str) {
-		return [];
+	
+	public array function getExpressionsFromString(string string) {
+		var result = arrayNew(1);
+		var pos = 0;
+		var c = "";
+		var hashStack = 0;
+		var parenStack = 0;
+		var bracketStack = 0;
+		var inSingleQuote = false;
+		var inDoubleQuote = false;
+		var inExpression = false;
+		var expr = "";
+		var next = "";
+		var expressionStartPos = 0;
+		/*  
+				Cases to handle: 
+					"#foo()#" 
+					#foo(moo(), boo, "#x#")#
+					#foo("#moo("#shoe#")#")#
+					#foo["x#i#"]#
+					#foo(#moo()#)#
+					"Number ##1"
+					"Number ###getNumber()#"
+					#foo[bar[car[far]]]# 
+		*/
+		for ( pos=1 ; pos<=len(arguments.string) ; pos++ ) {
+			c = Mid(arguments.string, pos, 1);
+			if ( inExpression ) {
+				expr.append(c);
+			}
+			if ( c == "##" ) {
+				if ( !inExpression ) {
+					//  start of expr 
+					if ( pos < len(arguments.string) ) {
+						next = Mid(arguments.string, pos+1, 1);
+					} else {
+						next = "";
+					}
+					if ( next != "##" ) {
+						inExpression = true;
+						expr = createObject("java", "java.lang.StringBuilder").init(c);
+						expressionStartPos = pos;
+					}
+				} else if ( bracketStack == 0 && parenStack == 0 ) {
+					//  end of expr 
+					inExpression = false;
+					arrayAppend(result, {"expression"=expr.toString(), "position"=expressionStartPos});
+				}
+			} else if ( inExpression ) {
+				switch ( c ) {
+					case  "(":
+						parenStack = parenStack + 1;
+						break;
+					case  ")":
+						parenStack = parenStack - 1;
+						break;
+					case  "[":
+						bracketStack = bracketStack + 1;
+						break;
+					case  "]":
+						bracketStack = bracketStack - 1;
+						break;
+				}
+			}
+		}
+		return result;
 	}
 
+	public array function getExpressions() {
+		var expr = "";
+		var e = "";
+		if ( structKeyExists(variables, "expressions") ) {
+			return variables.expressions;
+		} else {
+			variables.expressions = arrayNew(1);
+		}
+		if ( listFindNoCase("cfset,cfif,cfelseif,cfreturn", getName()) ) {
+			arrayAppend(variables.expressions, {"expression"=getAttributeContent(), "position"=getStartPosition()});
+		} else {
+			//  attributes 
+			if ( hasAttributes() && (NOT isInnerContentEvaluated() || !hasInnerContent()) ) {
+				getAttributes();
+				return variables.attributeExpressions;
+			} else if ( isInnerContentEvaluated() && hasInnerContent() ) {
+				if ( hasAttributes() ) {
+					getAttributes();
+					if ( arrayLen(variables.attributeExpressions) ) {
+						arrayAppend(variables.expressions, variables.attributeExpressions, true);
+					}
+				}
+				expr = getExpressionsFromString(getStrippedInnerContent(stripComments=true, stripCFMLTags=true));
+				if ( arrayLen(expr) ) {
+					for ( e in expr ) {
+						e.position = e.position + getInnerContentStartPosition();
+						arrayAppend(variables.expressions, e);
+					}
+				}
+			}
+		}
+		return variables.expressions;
+	}
+
+	string function getStrippedInnerContent(boolean stripComments="true", boolean stripCFMLTags="false") {
+		var l = StructNew();
+		var innerContent = getInnerContent();
+		if ( arguments.stripComments && hasInnerContent() ) {
+			if ( !StructKeyExists(variables, "strippedInnerContent") ) {
+				l.found = Find("<!---", innerContent);
+				if ( l.found ) {
+					l.content = "";
+					l.inComment = 0;
+					l.lastCommentStart = 0;
+					for ( l.i=1 ; l.i<=Len(innerContent) ; l.i++ ) {
+						l.c = Mid(innerContent, l.i, 1);
+						if ( l.c == "<" ) {
+							if ( Mid(innerContent, l.i, 5) == "<!---" ) {
+								l.inComment = l.inComment + 1;
+							} else if ( l.inComment == 0 ) {
+								l.content = l.content & "<";
+							} else {
+								l.content = l.content & " ";
+							}
+						} else if ( l.c == ">" && l.inComment > 0 && l.i >= 4 ) {
+							if ( Mid(innerContent, l.i-4, 4) == "--->" ) {
+								l.inComment = l.inComment - 1;
+							}
+							if ( l.inComment == 0 ) {
+								l.content = l.content & ">";
+							} else {
+								l.content = l.content & " ";
+							}
+						} else if ( l.c == Chr(13) ) {
+							l.content = l.content & Chr(10);
+						} else if ( l.c == Chr(10) ) {
+							l.content = l.content & Chr(10);
+						} else if ( l.inComment > 0 ) {
+							l.content = l.content & " ";
+						} else {
+							//  not in comment 
+							l.content = l.content & l.c;
+						}
+					}
+					variables.strippedInnerContent = l.content;
+				} else {
+					//  no comments 
+					variables.strippedInnerContent = innerContent;
+				}
+			}
+			if ( arguments.stripCFMLTags ) {
+				l.stripResult = variables.strippedInnerContent;
+				for ( l.match in reMatchNoCase("</?cf[^>]+>", l.stripResult) ) {
+					l.replace = repeatString(" ", len(l.match));
+					l.stripResult = replace(l.stripResult, l.match, l.replace, "all");
+				}
+				return l.stripResult;
+			}
+			return variables.strippedInnerContent;
+		}
+		return innerContent;
+	}
+
+	public array function getVariablesWritten() {
+		var vars = ArrayNew(1);
+		var attrs = getAttributes();
+		switch ( LCase(getName()) ) {
+			case  "cfset":
+				if ( getAttributeContent() contains "=" ) {
+					ArrayAppend(vars, Trim(ListFirst(getAttributeContent(), "=")));
+				}
+				break;
+			case  "cfquery":
+				if ( StructKeyExists(attrs, "name") ) {
+					ArrayAppend(vars, attrs.name);
+				}
+				if ( StructKeyExists(attrs, "result") ) {
+					ArrayAppend(vars, attrs.result);
+				}
+				break;
+			case  "cfhttp":
+				if ( StructKeyExists(attrs, "result") ) {
+					ArrayAppend(vars, attrs.result);
+				} else {
+					ArrayAppend(vars, "cfhttp");
+				}
+				break;
+			case  "cfparam":
+				if ( StructKeyExists(attrs, "name") ) {
+					ArrayAppend(vars, attrs.name);
+				}
+				break;
+		}
+		return vars;
+	}
 
 }

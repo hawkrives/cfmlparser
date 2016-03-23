@@ -83,8 +83,21 @@ component extends="BaseTest" {
 		var tag = "<" & "cfabort" & "> foo";
 		$assert.isEqual(9, tp.getTagEndPosition(tag, len(tag), 1));
 
-		tag = "<" & "cfabort" & "> foo";
 
+	}
+
+	function testGetTagEndPositionPound() {
+		var tp = new cfmlparser.TagParser();
+		var tag = "<" & "cfif c IS ""####""" & "> foo";
+		$assert.isEqual(16, tp.getTagEndPosition(tag, len(tag), 1));
+
+	}
+
+	function testGetTagEndPositionParserPound() {
+		var parser = getParser("tag/tag-end-test.cfm");
+		var statements = parser.getStatements();
+		var tag = statements[1];
+		$assert.isEqual(16, tag.getStartTagEndPosition());
 	}
 
 	private function getParser(string template) {
