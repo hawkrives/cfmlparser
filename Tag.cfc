@@ -340,7 +340,7 @@ component extends="Statement" {
 		var innerContent = getInnerContent();
 		if ( arguments.stripComments && hasInnerContent() ) {
 			if ( !StructKeyExists(variables, "strippedInnerContent") ) {
-				l.found = Find("<!---", innerContent);
+				l.found = Find("<"&"!---", innerContent);
 				if ( l.found ) {
 					l.content = "";
 					l.inComment = 0;
