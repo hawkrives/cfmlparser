@@ -102,4 +102,15 @@ component {
 		return Mid(variables.fileContent, lineStart, lineEnd-lineStart+1);
 	}
 
+	public array function getStatementsByName(string name) {
+		var stmts = [];
+		var s = "";
+		for (s in getStatements()) {
+			if (listFindNoCase(arguments.name, s.getName())) {
+				arrayAppend(stmts, s);
+			}
+		}
+		return stmts;
+	}
+
 }

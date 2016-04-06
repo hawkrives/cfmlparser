@@ -418,6 +418,11 @@ component extends="Statement" {
 					ArrayAppend(vars, "cfhttp");
 				}
 				break;
+			case "cfprocparam":
+				if ( StructKeyExists(attrs, "variable") && StructKeyExists(attrs, "type") && attrs.type == "out" ) {
+					ArrayAppend(vars, attrs.variable);
+				}
+				break;
 			case  "cfparam":
 				if ( StructKeyExists(attrs, "name") ) {
 					ArrayAppend(vars, attrs.name);
