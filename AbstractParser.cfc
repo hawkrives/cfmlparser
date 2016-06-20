@@ -23,4 +23,9 @@ component {
 		}
 		return mid(arguments.str, arguments.start, arguments.end-arguments.start);
 	}
+
+	boolean function isScript() {
+		return false;
+	}
+
 }

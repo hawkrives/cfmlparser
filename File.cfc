@@ -13,9 +13,11 @@ component {
 		}
 		variables.filePath = arguments.filePath;
 		variables.fileLength = len(variables.fileContent);
-		if (reFind("component[^>]*{", arguments.fileContent)) {
+		if (reFind("component[^>]*{", variables.fileContent)) {
 			//script cfc
 			variables.isScript = true;
+			variables.parser = new ScriptParser();
+			variables.parser.parse(this);
 		} else {
 			//tag based file
 			variables.parser = new TagParser();

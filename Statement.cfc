@@ -1,4 +1,4 @@
-component {
+component accessors="false" {
 
 	variables.name = "";
 	variables.startPosition = 0;
@@ -35,12 +35,17 @@ component {
 	public numeric function getStartPosition() {
 		return variables.startPosition;
 	}
+	
 
 	public boolean function isTag() {
 		return false;
 	}
 
 	public boolean function isComment() {
+		return false;
+	}
+
+	public boolean function isFunction() {
 		return false;
 	}
 
@@ -76,6 +81,11 @@ component {
 		return variables.children;
 	}
 
+	public boolean function hasChildren() {
+		return arrayLen(variables.children) > 0;
+	}
+
+	/* for debugging */
 	function getVariables() {
 		var rtn = {};
 		var key = "";

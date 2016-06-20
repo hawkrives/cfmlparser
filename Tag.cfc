@@ -9,6 +9,10 @@ component extends="Statement" {
 		return true;
 	}
 
+	public boolean function isFunction() {
+		return getName() == "cffunction";
+	}
+
 	public void function setEndTagStartPosition(position) {
 		variables.endTagStartPosition = arguments.position;
 	}
