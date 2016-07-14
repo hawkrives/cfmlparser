@@ -1,6 +1,6 @@
 component extends="AbstractParser" {
 
-	this.STATE = {NONE=0,COMMENT=1, IF_STATEMENT=2, ELSEIF_STATEMENT=3, ELSE_STATEMENT=4, SWITCH_STATEMENT=5, STATEMENT=6, COMPONENT_STATEMENT=7, FOR=8,WHILE=9,RETURN=10,CLOSURE=11,FUNCTION_STATEMENT=12};
+	this.STATE = {NONE=0,COMMENT=1, IF_STATEMENT=2, ELSEIF_STATEMENT=3, ELSE_STATEMENT=4, SWITCH_STATEMENT=5, STATEMENT=6, COMPONENT_STATEMENT=7, FOR_LOOP=8,WHILE_LOOP=9,RETURN_STATEMENT=10,CLOSURE=11,FUNCTION_STATEMENT=12};
 
 	public function parse(file) {
 		var content = arguments.file.getFileContent();
@@ -194,7 +194,7 @@ component extends="AbstractParser" {
 							continue;
 						} else if (c == "r" && reFind("return[\t\r\n ;]", mid(content, pos, 7)) == pos) {
 							currentStatement = new ScriptStatement(name="return", startPosition=pos, file=arguments.file, parent=parent);
-							currentState = this.STATE.RETURN;
+							currentState = this.STATE.RETURN_STATEMENT;
 							addStatement(currentStatement);
 							if (!isSimpleValue(parent)) {
 								parent.addChild(currentStatement);
