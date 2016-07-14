@@ -94,6 +94,9 @@ component extends="AbstractParser" {
 						parent.setEndPosition(gtPos);
 						parent = parent.getParent();
 					} 
+				} else {
+					//not a CFML tag 
+					gtPos = ltPos+1;
 				}	
 			}
 			ltPos = find("<", content, gtPos);

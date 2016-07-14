@@ -69,6 +69,15 @@ component extends="BaseTest" {
 
 	}
 
+	function testCFTagInHTML() {
+		var parser = getParser("tag/cftag-in-html.cfm");
+		var statements = parser.getStatements();
+		
+
+		$assert.isTrue(arrayLen(statements) == 1);
+
+	}
+
 	function testGtInTagAttributeWithSameQuotes() {
 		var parser = getParser("tag/gt-in-tag.cfm");
 		var statements = parser.getStatements();
