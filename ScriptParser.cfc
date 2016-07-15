@@ -98,9 +98,6 @@ component extends="AbstractParser" {
 						currentState = this.STATE.CLOSURE;
 						sb.append(c);
 					} else {
-						if (currentStatement.isComment()) {
-							throw(message="setBodyOpen for Comment? #serializeJSON(local)#");
-						}
 						currentStatement.setBodyOpen(pos);
 						parent = currentStatement;
 						currentState = this.STATE.NONE;
