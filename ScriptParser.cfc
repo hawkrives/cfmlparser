@@ -21,6 +21,7 @@ component extends="AbstractParser" {
 		var stringOpenChar = "";
 		var currentStatement = "";
 		var currentStatementStart = 1;
+		var commentStatement = "";
 		var sb = createObject("java", "java.lang.StringBuilder");
 		while(pos<=contentLength) {
 			c = mid(content, pos, 1);
@@ -44,20 +45,20 @@ component extends="AbstractParser" {
 				sb.append(c);
 			} else if (!inString) {
 				if (c == "/" && mid(content, pos, 2) == "/*") {
-					currentState = this.STATE.COMMENT;
-					currentStatement = new Comment(name="/*", startPosition=pos, parent=parent, file=arguments.file);
+					//currentState = this.STATE.COMMENT;
+					commentStatement = new Comment(name="/*", startPosition=pos, parent=parent, file=arguments.file);
 					if (!isSimpleValue(parent)) {
-						parent.addChild(currentStatement);
+						parent.addChild(commentStatement);
 					}
 					endPos = find("*/", content, pos+3);
 					if (endPos == 0) {
 						//end of doc
 						endPos = contentLength;
 					}
-					currentStatement.setEndPosition(endPos);
-					addStatement(currentStatement);
+					commentStatement.setEndPosition(endPos);
+					addStatement(commentStatement);
 					pos = endPos+1;
-					currentState = this.STATE.NONE;
+					//currentState = this.STATE.NONE;
 					
 					continue;
 				} else if (c=="/" && mid(content, pos, 2) == "//") {
@@ -67,14 +68,14 @@ component extends="AbstractParser" {
 						endPos = contentLength;
 					}
 					
-					currentStatement = new Comment(name="//", startPosition=pos, file=arguments.file, parent=parent);
-					currentStatement.setEndPosition(endPos);
-					addStatement(currentStatement);
+					commentStatement = new Comment(name="//", startPosition=pos, file=arguments.file, parent=parent);
+					commentStatement.setEndPosition(endPos);
+					addStatement(commentStatement);
 					if (!isSimpleValue(parent)) {
-						parent.addChild(currentStatement);
-					}
+						parent.addChild(commentStatement);
+					} 
 					pos = endPos+1;
-					currentState = this.STATE.NONE;
+					//currentState = this.STATE.NONE;
 					continue;
 				} else if (c == "}") {
 					if (currentState == this.STATE.CLOSURE) {
@@ -97,7 +98,9 @@ component extends="AbstractParser" {
 						currentState = this.STATE.CLOSURE;
 						sb.append(c);
 					} else {
-						
+						if (currentStatement.isComment()) {
+							throw(message="setBodyOpen for Comment? #serializeJSON(local)#");
+						}
 						currentStatement.setBodyOpen(pos);
 						parent = currentStatement;
 						currentState = this.STATE.NONE;
