@@ -45,7 +45,7 @@ component extends="Statement" {
 		return listFindNoCase("cfoutput,cfmail,cfsavecontent,cfquery,cfdocument,cfpdf,cfhtmltopdf,cfhtmltopdfitem,cfscript,cfform,cfloop,cfif,cfelse,cfelseif,cftry,cfcatch,cffinally,cfstoredproc,cfswitch,cfcase,cfdefaultcase,cfcomponent,cffunction,cfchart,cfclient,cfdiv,cfdocumentitem,cfdocumentsection,cfformgroup,cfgrid,cfhttp,cfimap,cfinterface,cfinvoke,cflayout,cflock,cflogin,cfmap,cfmenu,cfmodule,cfpod,cfpresentation,cfthread,cfreport,cfsilent,cftable,cftextarea,cftimer,cftransaction,cftree,cfzip,cfwindow,cfxml", getName());
 	}
 
-	public string function getAttributeContent() {
+	public string function getAttributeContent(stripTrailingSlash=false) {
 		if (!structKeyExists(variables, "attributeContent")) {
 			if (getStartTagEndPosition() == 0 || getStartPosition() == 0 || getStartPosition() >= getStartTagEndPosition()) {
 				throw(message="Unable to getAttributeContent for tag: #getName()# startPosition:#getStartPosition()# startTagEndPosition:#getStartTagEndPosition()#");
@@ -57,6 +57,9 @@ component extends="Statement" {
 				variables.attributeContent = reReplace(variables.attributeContent, "^[[:space:]]*" & getName(), "");
 			}
 			
+		}
+		if (arguments.stripTrailingSlash) {
+			variables.attributeContent = reReplace(variables.attributeContent, "\/[[:space:]]*$", "");
 		}
 		return variables.attributeContent;
 	}
