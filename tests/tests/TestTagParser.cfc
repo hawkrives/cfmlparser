@@ -109,6 +109,40 @@ component extends="BaseTest" {
 		$assert.isEqual(16, tag.getStartTagEndPosition());
 	}
 
+	function testTagThatCanHaveBodyWithoutBody() {
+		var parser = getParser("tag/cfhttp.cfm");
+		var statements = parser.getStatements();
+		var httpTag = statements[2];
+		var dumpTag = statements[3];
+		$assert.isEqual("cfhttp", httpTag.getName());
+		$assert.isFalse(httpTag.hasInnerContent());
+		$assert.isLT(httpTag.getEndTagStartPosition(), dumpTag.getStartPosition());
+	}
+
+	function testTagThatCanHaveBodyWithBody() {
+		var parser = getParser("tag/cfhttp.cfm");
+		var statements = parser.getStatements();
+		var httpTag = statements[4];
+		var httpParamTag = statements[5];
+		var dumpTag = statements[6];
+		$assert.isEqual("cfhttp", httpTag.getName(), "cfhttp tag");
+		$assert.isEqual("cfhttpparam", httpParamTag.getName());
+		$assert.isEqual("cfdump", dumpTag.getName());
+		$assert.isTrue(httpTag.hasInnerContent());
+		$assert.isLT(httpTag.getEndTagStartPosition(), dumpTag.getStartPosition());
+		$assert.isLT(httpTag.getEndPosition(), dumpTag.getStartPosition());
+		$assert.isGT(httpTag.getEndPosition(), httpParamTag.getStartPosition());
+	}
+
+	function testAttributeValueWithEqualPound() {
+		var expect = "GoogleLogin auth=##authdata.auth##";
+		var parser = getParser("tag/cfhttp.cfm");
+		var statements = parser.getStatements();
+		var httpParamTag = statements[5];
+		var attr = httpParamTag.getAttributes();
+		$assert.isEqual(expect, attr.value);
+	}
+
 	private function getParser(string template) {
 		return getFile(arguments.template).getParser();
 	}

@@ -139,15 +139,15 @@ component extends="Statement" {
 					parenStack = parenStack-1;
 					attributeValue = attributeValue & c;
 				}
-				else if ( c IS "[" AND inExpr AND mode IS "attributeValue" ) {
+				else if ( c IS "[" && inExpr && mode == "attributeValue" ) {
 					bracketStack = bracketStack+1;
 					attributeValue = attributeValue & c;
 				}
-				else if ( c IS "]" AND inExpr AND mode IS "attributeValue" ) {
+				else if ( c IS "]" && inExpr && mode == "attributeValue" ) {
 					bracketStack = bracketStack-1;
 					attributeValue = attributeValue & c;
 				}
-				else if ( c IS "=" AND NOT inPound ) {
+				else if ( c IS "=" && !inPound && mode=="attributeName") {
 					mode = "attributeValueStart";
 					quotedValue = "";
 				}
@@ -437,6 +437,14 @@ component extends="Statement" {
 				break;
 		}
 		return vars;
+	}
+
+	/* for debugging */
+	function getVariables() {
+		var rtn = super.getVariables();
+		rtn.attributes = getAttributes();
+		rtn.attributeContent = getAttributeContent();
+		return rtn;
 	}
 
 }
