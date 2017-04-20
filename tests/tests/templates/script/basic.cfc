@@ -1,6 +1,4 @@
-component  {
-	variables.animal = "chicken";
-
+component {
 	public function getSound() {
 		var sound = "";
 		if (variables.animal == "chicken") {

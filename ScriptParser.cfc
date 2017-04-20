@@ -109,6 +109,7 @@ component extends="AbstractParser" {
 						currentState = this.STATE.NONE;
 						
 						currentStatement.setEndPosition(pos);
+						parent = currentStatement.getParent();
 						//throw(message="hit ; pos=#pos#; sb:#sb.toString()#");
 						//addStatement(currentStatement);
 						//throw(message="sb=#sb.toString()#|" &serializeJSON(local));
