@@ -187,11 +187,11 @@ component extends="AbstractParser" {
 						} else if (c == "v" && trim(mid(content, pos, 4)) == "var") {
 							currentStatement = new ScriptStatement(name="var", startPosition=pos, file=arguments.file, parent=parent);
 							currentState = this.STATE.STATEMENT;
-							parent = currentStatement;
 							addStatement(currentStatement);
 							if (!isSimpleValue(parent)) {
 								parent.addChild(currentStatement);
 							}
+							parent = currentStatement;
 							sb.append("var ");
 							pos = pos + 4;
 							continue;
