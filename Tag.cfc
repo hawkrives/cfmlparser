@@ -112,7 +112,12 @@ component extends="Statement" {
 			for (i=1;i<=len(variables.attributeContent);i++) {
 				c = mid(variables.attributeContent, i, 1);
 				if (c IS "##") {
-					if (!inExpr && i < len(variables.attributeContent) && mid(variables.attributeContent, i+1, 1) != "##") {
+					if (!inExpr && inPound && i>1 && mid(variables.attributeContent, i-1, 1) == "##") {
+
+						//not in expr but in a pound with previous pound (escaped literal hashtag)
+						inExpr = false;
+					}
+					else if (!inExpr && i < len(variables.attributeContent) && mid(variables.attributeContent, i+1, 1) != "##") {
 						// not in expr and next char is not pound
 						inExpr = true;
 						parenStack = 0;
