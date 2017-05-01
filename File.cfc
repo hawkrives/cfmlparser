@@ -13,16 +13,41 @@ component {
 		}
 		variables.filePath = arguments.filePath;
 		variables.fileLength = len(variables.fileContent);
-		if (reFind("component[^>]*{", variables.fileContent)) {
+
+		local.hasScriptComponentPattern = reFindNoCase("component[^>]*{", variables.fileContent);
+		local.hasTagComponentPattern = !findNoCase("<" & "cfcomponent", variables.fileContent);
+		if (local.hasTagComponentPattern && !local.hasTagComponentPattern) {
 			//script cfc
 			variables.isScript = true;
-			variables.parser = new ScriptParser();
-			variables.parser.parse(this);
-		} else {
-			//tag based file
-			variables.parser = new TagParser();
-			variables.parser.parse(this);
+			
+		} else if (local.hasTagComponentPattern && local.hasScriptComponentPattern) {
+
+			//possible that cfcomponent it could be in a comment
+			if (reFindNoCase("//[^\n]*cfcomponent[^\n]*[\n]", variables.fileContent)) {
+				variables.isScript = true;
+			}
+			
+			else if (!reFindNoCase("<" & "cffunction", variables.fileContent) && !reFindNoCase("<" & "cfproperty", variables.fileContent)) {
+				//if it does not have a cffunction or cfproperty assume scritp
+				variables.isScript = true;
+			} else {
+				variables.isScript=false;
+			}
+
 		}
+
+		else {
+			//tag based file
+			variables.isScript = false;
+		}
+
+		if (variables.isScript) {
+			variables.parser = new ScriptParser();
+		} else {
+			variables.parser = new TagParser();
+		}
+		
+		variables.parser.parse(this);
 
 	}
 
