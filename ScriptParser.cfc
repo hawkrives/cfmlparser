@@ -109,6 +109,9 @@ component extends="AbstractParser" {
 						currentState = this.STATE.NONE;
 						
 						currentStatement.setEndPosition(pos);
+						if (!isSimpleValue(parent)) {
+							parent = currentStatement.getParent();
+						} 
 						//throw(message="hit ; pos=#pos#; sb:#sb.toString()#");
 						//addStatement(currentStatement);
 						//throw(message="sb=#sb.toString()#|" &serializeJSON(local));
@@ -184,11 +187,11 @@ component extends="AbstractParser" {
 						} else if (c == "v" && trim(mid(content, pos, 4)) == "var") {
 							currentStatement = new ScriptStatement(name="var", startPosition=pos, file=arguments.file, parent=parent);
 							currentState = this.STATE.STATEMENT;
-							parent = currentStatement;
 							addStatement(currentStatement);
 							if (!isSimpleValue(parent)) {
 								parent.addChild(currentStatement);
 							}
+							parent = currentStatement;
 							sb.append("var ");
 							pos = pos + 4;
 							continue;
