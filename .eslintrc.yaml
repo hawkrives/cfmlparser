@@ -1,0 +1,32 @@
+env:
+  node: true
+  es6: true
+
+extends:
+  - eslint:recommended
+  - eslint-config-prettier
+
+globals:
+  arrayLen: 2
+  chr: 2
+  fileRead: 2
+  find: 2
+  findNoCase: 2
+  isSimpleValue: 2
+  left: 2
+  len: 2
+  mid: 2
+  reFind: 2
+  reFindNoCase: 2
+  listFindNoCase: 2
+
+rules:
+  no-unused-vars:
+    - warn
+    - argsIgnorePattern: "^_"
+      varsIgnorePattern: "^_"
+  no-console: off
+
+  flowtype/space-after-type-colon: off
+  flowtype/generic-spacing: off
+  no-irregular-whitespace: off
